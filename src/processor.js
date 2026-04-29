@@ -33,6 +33,10 @@
     return text;
   }
 
+  function formatOutputTripNumber(value) {
+    return String(value ?? "").replace(/-/g, "");
+  }
+
   function toNumber(value) {
     if (typeof value === "number" && Number.isFinite(value)) return value;
     const normalized = String(value ?? "")
@@ -160,7 +164,7 @@
 
   function toOutputRows(records) {
     return records.map((record) => ({
-      "Trip Number": record.tripNumber,
+      "Trip Number": formatOutputTripNumber(record.tripNumber),
       "Trip Date": record.tripDate,
       "Total pilgrims": record.totalPilgrims,
       "Total Bags": record.totalBags,
