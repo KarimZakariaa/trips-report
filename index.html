@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Trips Report Combiner</title>
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <main class="app">
+      <header class="topbar">
+        <div>
+          <h1>Trips Report Combiner</h1>
+          <p class="subtitle">Upload the Madina and Jeddah workbooks to produce one sorted Excel file.</p>
+        </div>
+        <div id="status" class="status" data-type="muted">Waiting for files.</div>
+      </header>
+
+      <section class="panel upload-panel" aria-label="Workbook uploads">
+        <div class="file-grid">
+          <label class="file-control">
+            <span>Madina file</span>
+            <input id="madina-file" type="file" accept=".xlsx,.xls">
+          </label>
+          <label class="file-control">
+            <span>Jeddah file</span>
+            <input id="jeddah-file" type="file" accept=".xlsx,.xls">
+          </label>
+        </div>
+
+        <div class="actions">
+          <button id="generate" class="button primary" type="button">Generate</button>
+          <button id="download" class="button" type="button" disabled>Download Excel</button>
+          <button id="reset" class="button" type="button">Reset</button>
+        </div>
+
+        <ul id="warnings" class="warnings" aria-live="polite"></ul>
+      </section>
+
+      <section class="summary-grid" aria-label="Output summary">
+        <div class="panel metric">
+          <span>Rows</span>
+          <strong id="summary-rows">0</strong>
+        </div>
+        <div class="panel metric">
+          <span>Total pilgrims</span>
+          <strong id="summary-pilgrims">0</strong>
+        </div>
+        <div class="panel metric">
+          <span>Total Bags</span>
+          <strong id="summary-bags">0</strong>
+        </div>
+      </section>
+
+      <section class="panel preview-panel" aria-label="Output preview">
+        <div class="table-wrap">
+          <table id="preview">
+            <thead>
+              <tr>
+                <th>Trip Number</th>
+                <th>Trip Date</th>
+                <th>Total pilgrims</th>
+                <th>Total Bags</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+        <p id="empty-preview" class="empty">No rows generated.</p>
+      </section>
+    </main>
+
+    <script src="node_modules/xlsx/dist/xlsx.full.min.js"></script>
+    <script src="src/processor.js"></script>
+    <script src="src/app.js"></script>
+  </body>
+</html>
