@@ -4,6 +4,7 @@
   "description": "Static Excel combiner for Madina and Jeddah trip reports.",
   "main": "index.js",
   "scripts": {
+    "build:pages": "node scripts/build-pages.js",
     "check": "node --check src/processor.js && node --check src/app.js"
   },
   "keywords": [],
