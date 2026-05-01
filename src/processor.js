@@ -37,6 +37,11 @@
     return String(value ?? "").replace(/-/g, "");
   }
 
+  function formatOutputDate(value) {
+    const match = String(value ?? "").match(/^(\d{4})-(\d{2})-(\d{2})$/);
+    return match ? `${match[2]}/${match[3]}/${match[1]}` : String(value ?? "");
+  }
+
   function toNumber(value) {
     if (typeof value === "number" && Number.isFinite(value)) return value;
     const normalized = String(value ?? "")
@@ -169,7 +174,7 @@
     return records.map((record) => ({
       "Trip Number": formatOutputTripNumber(record.tripNumber),
       "M/S": record.tripType,
-      "Trip Date": record.tripDate,
+      "Trip Date": formatOutputDate(record.tripDate),
       "Total pilgrims": record.totalPilgrims,
       "Total Bags": record.totalBags,
     }));
@@ -196,14 +201,14 @@
     };
   }
 
-  function buildOutputWorkbook(rows) {
+  function buildOutputWorkbook(rows, sheetName = "Combined Trips") {
     const worksheet = XLSX.utils.json_to_sheet(rows, {
       header: ["Trip Number", "M/S", "Trip Date", "Total pilgrims", "Total Bags"],
     });
     worksheet["!cols"] = [{ wch: 18 }, { wch: 8 }, { wch: 14 }, { wch: 16 }, { wch: 14 }];
 
     const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, "Combined Trips");
+    XLSX.utils.book_append_sheet(workbook, worksheet, sheetName);
     return workbook;
   }
 

@@ -28,6 +28,10 @@ function formatNumber(value) {
   return new Intl.NumberFormat("en-US", { maximumFractionDigits: 2 }).format(value);
 }
 
+function rowsByTripType(type) {
+  return outputRows.filter((row) => row["M/S"] === type);
+}
+
 function renderWarnings(warnings) {
   warningNode.innerHTML = "";
   warnings.forEach((warning) => {
@@ -80,7 +84,10 @@ async function generateOutput() {
     }
 
     downloadButton.disabled = false;
-    setStatus(`Ready: ${formatNumber(outputRows.length)} combined trip rows.`, "success");
+    setStatus(
+      `Ready: ${formatNumber(rowsByTripType("M").length)} M rows, ${formatNumber(rowsByTripType("S").length)} S rows.`,
+      "success"
+    );
   } catch (error) {
     outputRows = [];
     renderPreview(outputRows);
@@ -93,8 +100,16 @@ async function generateOutput() {
 function downloadOutput() {
   if (outputRows.length === 0) return;
 
-  const workbook = processor.buildOutputWorkbook(outputRows);
-  window.XLSX.writeFile(workbook, "combined-trips.xlsx");
+  [
+    { type: "M", filename: "combined-trips-M.xlsx" },
+    { type: "S", filename: "combined-trips-S.xlsx" },
+  ].forEach(({ type, filename }) => {
+    const rows = rowsByTripType(type);
+    if (rows.length === 0) return;
+
+    const workbook = processor.buildOutputWorkbook(rows, `${type} Trips`);
+    window.XLSX.writeFile(workbook, filename);
+  });
 }
 
 function resetPage() {
