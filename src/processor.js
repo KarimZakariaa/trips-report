@@ -118,6 +118,7 @@
       for (let rowIndex = headerMap.rowIndex + 1; rowIndex < rows.length; rowIndex += 1) {
         const row = rows[rowIndex] || [];
         const tripNumber = normalizeTripNumber(row[headerMap.trip]);
+        const tripType = String(row[headerMap.trip - 1] ?? "").trim().toUpperCase();
         const normalizedTrip = normalizeArabic(tripNumber);
 
         if (!tripNumber || normalizedTrip === "الاجماليالعام" || normalizedTrip === "رقمالرحلة") {
@@ -130,6 +131,7 @@
 
         records.push({
           tripNumber,
+          tripType,
           tripKey: tripNumber.toUpperCase(),
           tripDate: date.key,
           tripDateSort: date.timestamp,
@@ -151,6 +153,7 @@
       if (existing) {
         existing.totalPilgrims += record.totalPilgrims;
         existing.totalBags += record.totalBags;
+        if (!existing.tripType) existing.tripType = record.tripType;
       } else {
         grouped.set(key, { ...record });
       }
@@ -165,6 +168,7 @@
   function toOutputRows(records) {
     return records.map((record) => ({
       "Trip Number": formatOutputTripNumber(record.tripNumber),
+      "M/S": record.tripType,
       "Trip Date": record.tripDate,
       "Total pilgrims": record.totalPilgrims,
       "Total Bags": record.totalBags,
@@ -194,9 +198,9 @@
 
   function buildOutputWorkbook(rows) {
     const worksheet = XLSX.utils.json_to_sheet(rows, {
-      header: ["Trip Number", "Trip Date", "Total pilgrims", "Total Bags"],
+      header: ["Trip Number", "M/S", "Trip Date", "Total pilgrims", "Total Bags"],
     });
-    worksheet["!cols"] = [{ wch: 18 }, { wch: 14 }, { wch: 16 }, { wch: 14 }];
+    worksheet["!cols"] = [{ wch: 18 }, { wch: 8 }, { wch: 14 }, { wch: 16 }, { wch: 14 }];
 
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, "Combined Trips");

@@ -42,7 +42,7 @@ function renderPreview(rows) {
 
   rows.slice(0, 100).forEach((row) => {
     const tr = document.createElement("tr");
-    ["Trip Number", "Trip Date", "Total pilgrims", "Total Bags"].forEach((field) => {
+    ["Trip Number", "M/S", "Trip Date", "Total pilgrims", "Total Bags"].forEach((field) => {
       const td = document.createElement("td");
       td.textContent = field.includes("Total") ? formatNumber(row[field]) : row[field];
       tr.appendChild(td);
