@@ -42,6 +42,11 @@
     return match ? `${match[2]}/${match[3]}/${match[1]}` : String(value ?? "");
   }
 
+  function normalizeTripType(value) {
+    const tripType = String(value ?? "").trim().toUpperCase();
+    return tripType === "M" || tripType === "S" ? tripType : "";
+  }
+
   function toNumber(value) {
     if (typeof value === "number" && Number.isFinite(value)) return value;
     const normalized = String(value ?? "")
@@ -123,7 +128,7 @@
       for (let rowIndex = headerMap.rowIndex + 1; rowIndex < rows.length; rowIndex += 1) {
         const row = rows[rowIndex] || [];
         const tripNumber = normalizeTripNumber(row[headerMap.trip]);
-        const tripType = String(row[headerMap.trip - 1] ?? "").trim().toUpperCase();
+        const tripType = normalizeTripType(row[headerMap.trip - 1]);
         const normalizedTrip = normalizeArabic(tripNumber);
 
         if (!tripNumber || normalizedTrip === "الاجماليالعام" || normalizedTrip === "رقمالرحلة") {
@@ -132,7 +137,7 @@
 
         const totalPilgrims = toNumber(row[headerMap.pilgrims]);
         const totalBags = toNumber(row[headerMap.bags]);
-        if (totalPilgrims === 0 && totalBags === 0) continue;
+        if (!tripType && totalPilgrims === 0 && totalBags === 0) continue;
 
         records.push({
           tripNumber,
@@ -153,7 +158,7 @@
     const grouped = new Map();
 
     records.forEach((record) => {
-      const key = `${record.tripDate}||${record.tripKey}`;
+      const key = `${record.tripDate}||${record.tripType}||${record.tripKey}`;
       const existing = grouped.get(key);
       if (existing) {
         existing.totalPilgrims += record.totalPilgrims;
