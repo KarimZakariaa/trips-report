@@ -88,18 +88,33 @@
     return row.findIndex((cell) => normalizedAliases.includes(normalizeArabic(cell)));
   }
 
+  function findHeaders(row, aliases) {
+    const normalizedAliases = aliases.map((alias) => normalizeArabic(alias));
+    return row.reduce((indexes, cell, index) => {
+      if (normalizedAliases.includes(normalizeArabic(cell))) indexes.push(index);
+      return indexes;
+    }, []);
+  }
+
   function findHeaderMap(rows) {
     for (let rowIndex = 0; rowIndex < rows.length; rowIndex += 1) {
       const row = rows[rowIndex] || [];
       const trip = findHeader(row, HEADERS.trip);
-      const pilgrims = findHeader(row, HEADERS.pilgrims);
-      const bags = findHeader(row, HEADERS.bags);
+      const pilgrimsColumns = findHeaders(row, HEADERS.pilgrims);
+      const bagsColumns = findHeaders(row, HEADERS.bags);
+      const pilgrims = pilgrimsColumns[0] ?? -1;
+      const bags = bagsColumns[0] ?? -1;
 
       if (trip >= 0 && pilgrims >= 0 && bags >= 0) {
-        return { rowIndex, trip, pilgrims, bags };
+        return { rowIndex, trip, pilgrims, bags, pilgrimsColumns, bagsColumns };
       }
     }
     return null;
+  }
+
+  function firstPopulatedNumber(row, indexes) {
+    const values = indexes.map((index) => toNumber(row[index]));
+    return values.find((value) => value !== 0) ?? 0;
   }
 
   function parseWorkbook(workbook, sourceName = "") {
@@ -135,8 +150,8 @@
           continue;
         }
 
-        const totalPilgrims = toNumber(row[headerMap.pilgrims]);
-        const totalBags = toNumber(row[headerMap.bags]);
+        const totalPilgrims = firstPopulatedNumber(row, headerMap.pilgrimsColumns);
+        const totalBags = firstPopulatedNumber(row, headerMap.bagsColumns);
         if (!tripType && totalPilgrims === 0 && totalBags === 0) continue;
 
         records.push({
